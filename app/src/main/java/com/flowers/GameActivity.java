@@ -1,0 +1,19 @@
+package com.flowers;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+import com.flowers.world.GameState;
+
+public class GameActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_game);
+
+        GameState.getInstance().setActivity(this);
+        GameState.getInstance().detectTouchAction();
+    }
+}
