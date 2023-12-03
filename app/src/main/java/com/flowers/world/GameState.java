@@ -9,13 +9,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.flowers.R;
 import com.flowers.mapEntity.Flower;
+import com.flowers.mapEntity.Snake;
 
 public class GameState {
 
     private FrameLayout _map;
     private AppCompatActivity _gameActivity;
     private static GameState _instance;
-
+    public int mapWidth()
+    {
+        return _map.getWidth();
+    }
+    public int mapHeight()
+    {
+        return _map.getHeight();
+    }
     public void setActivity(AppCompatActivity activity) {
         _gameActivity = activity;
         _map = _gameActivity.findViewById(R.id.map_layout);
@@ -29,10 +37,13 @@ public class GameState {
         if (event.getAction() == MotionEvent.ACTION_DOWN && PlayerState.getInstance().buyFlower()) {
             float x = event.getX();
             float y = event.getY();
-            Flower newFlower = new Flower(_gameActivity);
-            newFlower.updatePosition(x, y);
+            // Flower newFlower = new Flower(_gameActivity);
+            Snake snake = new Snake(_gameActivity);
+            snake.updatePosition(x, y);
+            //newFlower.updatePosition(x+20, y+20);
             updateCoinsLabel();
-            _map.addView(newFlower);
+            //_map.addView(newFlower);
+            _map.addView(snake);
             return true;
         }
         return false;
