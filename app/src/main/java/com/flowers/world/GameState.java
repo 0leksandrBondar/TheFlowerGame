@@ -16,17 +16,22 @@ public class GameState {
     private FrameLayout _map;
     private AppCompatActivity _gameActivity;
     private static GameState _instance;
-    public int mapWidth()
-    {
+
+    public int mapWidth() {
         return _map.getWidth();
     }
-    public int mapHeight()
-    {
+
+    public int mapHeight() {
         return _map.getHeight();
     }
+
     public void setActivity(AppCompatActivity activity) {
         _gameActivity = activity;
         _map = _gameActivity.findViewById(R.id.map_layout);
+    }
+
+    public AppCompatActivity getGameActivity() {
+        return _gameActivity;
     }
 
     public void detectTouchAction() {
@@ -37,22 +42,22 @@ public class GameState {
         if (event.getAction() == MotionEvent.ACTION_DOWN && PlayerState.getInstance().buyFlower()) {
             float x = event.getX();
             float y = event.getY();
-            // Flower newFlower = new Flower(_gameActivity);
+            Flower newFlower = new Flower(_gameActivity);
             Snake snake = new Snake(_gameActivity);
-            snake.updatePosition(x, y);
-            //newFlower.updatePosition(x+20, y+20);
+            newFlower.updatePosition(x + 20, y + 20);
             updateCoinsLabel();
-            //_map.addView(newFlower);
+            _map.addView(newFlower);
             _map.addView(snake);
             return true;
         }
         return false;
     }
-    public void updateCoinsLabel()
-    {
+
+    public void updateCoinsLabel() {
         TextView tv = _gameActivity.findViewById(R.id.coinsCount_text);
         tv.setText("Coins: " + PlayerState.getInstance().getNumberCoins());
     }
+
     public static GameState getInstance() {
         if (_instance == null) {
             _instance = new GameState();
