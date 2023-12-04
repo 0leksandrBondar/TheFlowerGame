@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Snake extends View {
 
@@ -28,7 +29,7 @@ public class Snake extends View {
     public class Node extends View {
         private Node prevNode;
         private Bitmap bitmap;
-        private float posX, posY;
+        public float posX, posY;
         private NodeType nodeType;
         private float targetX, targetY;
 
@@ -121,7 +122,7 @@ public class Snake extends View {
     }
 
     private final float speed = 5;
-    private ArrayList<Node> nodes = new ArrayList<>();
+    private CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
 
     public Snake(Context context) {
         super(context);
@@ -143,6 +144,18 @@ public class Snake extends View {
                 postInvalidate();
             }
         }, 0, 10);
+    }
+
+    public void removeNode() {
+        if (!nodes.isEmpty()) {
+            nodes.remove(nodes.size() - 1);
+            postInvalidate();
+        }
+    }
+
+    public CopyOnWriteArrayList<Node> getNodes()
+    {
+        return nodes;
     }
 
     private void increaseSnakeNode() {
@@ -168,13 +181,13 @@ public class Snake extends View {
     public void addNode(NodeType type) {
         Node node = new Node(GameState.getInstance().getGameActivity(), type);
 
-        if (!nodes.isEmpty())
+        if (!nodes.isEmpty()) {
             node.prevNode = nodes.get(nodes.size() - 1);
+            node.setPos(node.prevNode.posX, node.prevNode.posY);
+        }
         if (type == NodeType.Head) {
             Random rand = new Random();
             node.setPos(rand.nextInt(GameState.getInstance().mapWidth()), rand.nextInt(GameState.getInstance().mapHeight()));
-        } else {
-            node.setPos(node.prevNode.posX, node.prevNode.posY);
         }
         nodes.add(node);
     }

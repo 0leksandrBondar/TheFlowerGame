@@ -67,16 +67,31 @@ public class GameState {
     }
 
     private boolean onTouch(View v, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && PlayerState.getInstance().buyFlower()) {
-            float x = event.getX();
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             float y = event.getY();
-            addFlower(x, y);
+            float x = event.getX();
+            removeSnakeNode(x, y);
+            if(PlayerState.getInstance().buyFlower())
+                addFlower(x, y);
             updateCoinsLabel();
             return true;
         }
         return false;
     }
-
+    public void removeSnakeNode(float touchX, float touchY) {
+        for (int i = 0; i < _map.getChildCount(); ++i) {
+            View child = _map.getChildAt(i);
+            if (child instanceof Snake) {
+                Snake snake = (Snake) child;
+                for (Snake.Node node : snake.getNodes()) {
+                    if (Math.abs(node.posX - touchX) < 110 && Math.abs(node.posY - touchY) < 110) {
+                        snake.removeNode();
+                        break;
+                    }
+                }
+            }
+        }
+    }
     public void updateCoinsLabel() {
         TextView tv = _gameActivity.findViewById(R.id.coinsCount_text);
         tv.setText("Coins: " + PlayerState.getInstance().getNumberCoins());
