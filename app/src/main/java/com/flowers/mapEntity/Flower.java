@@ -21,10 +21,10 @@ public class Flower extends View {
         Grain, Flower
     }
 
-    private int flowerPrice = 50;
     private float flowerX = 0;
     private float flowerY = 0;
     private Bitmap flowerBitmap;
+    private int flowerPrice = 50;
     private Paint paint = new Paint();
     private FlowerState flowerState = FlowerState.Grain;
 
@@ -52,8 +52,12 @@ public class Flower extends View {
         invalidate(); // display update
     }
 
-    public int getFlowerPrice() {
-        return flowerPrice;
+    public float posX() {
+        return flowerX;
+    }
+
+    public float posY() {
+        return flowerY;
     }
 
     private void setFlowerState(FlowerState state) {

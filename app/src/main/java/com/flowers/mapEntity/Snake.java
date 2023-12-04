@@ -26,12 +26,23 @@ public class Snake extends View {
         Head
     }
 
+    private final float speed = 5;
+    private CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
+
     public class Node extends View {
         private Node prevNode;
         private Bitmap bitmap;
-        public float posX, posY;
+        private float posX, posY;
         private NodeType nodeType;
         private float targetX, targetY;
+
+        public float getPosX() {
+            return posX;
+        }
+
+        public float getPosY() {
+            return posY;
+        }
 
         public void setPos(float newPosX, float newPosY) {
             posX = newPosX;
@@ -121,9 +132,6 @@ public class Snake extends View {
         }
     }
 
-    private final float speed = 5;
-    private CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
-
     public Snake(Context context) {
         super(context);
 
@@ -153,9 +161,12 @@ public class Snake extends View {
         }
     }
 
-    public CopyOnWriteArrayList<Node> getNodes()
-    {
+    public CopyOnWriteArrayList<Node> getNodes() {
         return nodes;
+    }
+
+    public Node getHead() {
+        return nodes.get(0);
     }
 
     private void increaseSnakeNode() {
