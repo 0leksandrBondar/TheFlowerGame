@@ -46,7 +46,7 @@ public class Flower extends View {
         canvas.drawBitmap(flowerBitmap, flowerX, flowerY, paint);
     }
 
-    public void updatePosition(float x, float y) {
+    public void setPosition(float x, float y) {
         flowerX = x;
         flowerY = y;
         invalidate(); // display update
