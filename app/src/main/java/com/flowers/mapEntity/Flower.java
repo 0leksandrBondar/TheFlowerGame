@@ -21,10 +21,10 @@ public class Flower extends View {
         Grain, Flower
     }
 
-    private float flowerX = 0;
-    private float flowerY = 0;
+    private Handler handler;
+    private float flowerY = 0, flowerX = 0;
     private Bitmap flowerBitmap;
-    private int flowerPrice = 50;
+    private Runnable coinUpdater;
     private Paint paint = new Paint();
     private FlowerState flowerState = FlowerState.Grain;
 
@@ -64,20 +64,24 @@ public class Flower extends View {
         flowerState = state;
 
         if (flowerState == FlowerState.Flower) {
-            // Use a handler to post a delayed runnable with a delay of 3 seconds
-            final Handler handler = new Handler(Looper.getMainLooper());
-            final Runnable coinUpdater = new Runnable() {
+            handler = new Handler(Looper.getMainLooper());
+            coinUpdater = new Runnable() {
                 @Override
                 public void run() {
                     PlayerState.getInstance().increaseNumberCoins();
                     GameState.getInstance().updateCoinsLabel();
-                    // Post the same runnable again after 3 seconds
-                    handler.postDelayed(this, 3000);
+                    handler.postDelayed(this, 1000);
                 }
             };
             handler.postDelayed(coinUpdater, 3000);
         }
 
         invalidate();
+    }
+
+    public void stopCoinUpdater() {
+        if (handler != null && coinUpdater != null) {
+            handler.removeCallbacks(coinUpdater);
+        }
     }
 }

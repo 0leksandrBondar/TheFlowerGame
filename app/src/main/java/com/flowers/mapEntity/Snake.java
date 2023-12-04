@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.flowers.R;
 import com.flowers.world.GameState;
@@ -96,6 +97,7 @@ public class Snake extends View {
             posX += directionX * speed;
             posY += directionY * speed;
 
+            detectCollisionWithFlower(posX, posX);
             detectCollisionWithBorderMap();
             postInvalidate();
         }
@@ -104,10 +106,10 @@ public class Snake extends View {
             return a == b ? true : Math.abs(a - b) < Epsilon;
         }
 
+
         private void detectCollisionWithBorderMap() {
-            if (nodeType == NodeType.Body) {
+            if (nodeType == NodeType.Body)
                 return;
-            }
 
             final float mapWidth = GameState.getInstance().mapWidth() - bitmap.getWidth();
             final float mapHeight = GameState.getInstance().mapHeight() - bitmap.getHeight();
@@ -120,6 +122,31 @@ public class Snake extends View {
                     posY = mapHeight;
                 }
                 tryRandomizeDirection();
+            }
+        }
+
+        private void detectCollisionWithFlower(float posX, float posY) {
+            if (nodeType == NodeType.Body)
+                return;
+
+            FrameLayout map = GameState.getInstance().getMap();
+            Node head = nodes.get(0);
+
+            for (int i = 0; i < map.getChildCount(); ++i) {
+                View flowerChild = map.getChildAt(i);
+                if (flowerChild instanceof Flower) {
+                    Flower flower = (Flower) flowerChild;
+                    if (Math.abs(head.getPosX() - flower.posX()) < 160 && Math.abs(head.getPosY() - flower.posY()) < 160) {
+                        flower.stopCoinUpdater();
+                        GameState.getInstance().getGameActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                map.removeView(flower);
+                            }
+                        });
+                        break;
+                    }
+                }
             }
         }
 
@@ -136,8 +163,6 @@ public class Snake extends View {
         super(context);
 
         addNode(NodeType.Head);
-        addNode(NodeType.Body);
-
         Timer timerUpdate = new Timer();
 
         increaseSnakeNode();
