@@ -22,7 +22,7 @@ public class Flower extends View {
     }
 
     private Handler handler;
-    private float flowerY = 0, flowerX = 0;
+    private float posY = 0, posX = 0;
     private Bitmap flowerBitmap;
     private Runnable coinUpdater;
     private Paint paint = new Paint();
@@ -47,27 +47,27 @@ public class Flower extends View {
         int idFlowerImages = (flowerState == FlowerState.Grain) ? R.drawable.grain : R.drawable.flower;
         flowerBitmap = BitmapFactory.decodeResource(getResources(), idFlowerImages);
 
-        canvas.drawBitmap(flowerBitmap, flowerX, flowerY, paint);
+        canvas.drawBitmap(flowerBitmap, posX, posY, paint);
     }
 
     public void setPosition(float x, float y) {
-        flowerX = x;
-        flowerY = y;
+        posX = x;
+        posY = y;
         invalidate(); // display update
     }
 
     public float posX() {
-        return flowerX;
+        return posX;
     }
 
     public float posY() {
-        return flowerY;
+        return posY;
     }
 
     private void setFlowerState(FlowerState state) {
         flowerState = state;
 
-        if (flowerState == FlowerState.Flower) {
+        if (hasFlowerState()) {
             handler = new Handler(Looper.getMainLooper());
             coinUpdater = new Runnable() {
                 @Override
