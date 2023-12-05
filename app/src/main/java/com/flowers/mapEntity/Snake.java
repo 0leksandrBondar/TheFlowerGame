@@ -36,6 +36,7 @@ public class Snake extends View {
         private float posX, posY;
         private NodeType nodeType;
         private float targetX, targetY;
+        private final int maxSnakeLength = 10;
 
         public float getPosX() {
             return posX;
@@ -136,7 +137,7 @@ public class Snake extends View {
                 View flowerChild = map.getChildAt(i);
                 if (flowerChild instanceof Flower) {
                     Flower flower = (Flower) flowerChild;
-                    if (Math.abs(head.getPosX() - flower.posX()) < 160 && Math.abs(head.getPosY() - flower.posY()) < 160) {
+                    if (flower.hasFlowerState() && Math.abs(head.getPosX() - flower.posX()) < 160 && Math.abs(head.getPosY() - flower.posY()) < 160) {
                         flower.stopCoinUpdater();
                         GameState.getInstance().getGameActivity().runOnUiThread(new Runnable() {
                             @Override
@@ -215,6 +216,9 @@ public class Snake extends View {
     }
 
     public void addNode(NodeType type) {
+        if (nodes.size() >= 10)
+            return;
+
         Node node = new Node(GameState.getInstance().getGameActivity(), type);
 
         if (!nodes.isEmpty()) {

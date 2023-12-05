@@ -13,14 +13,13 @@ import com.flowers.R;
 import com.flowers.mapEntity.Flower;
 import com.flowers.mapEntity.Snake;
 
-import java.util.ArrayList;
-
 public class GameState {
     @SuppressLint("StaticFieldLeak")
     private static GameState _instance;
 
     // TODO: refactor accsesAddSnake
     private boolean accsesAddSnake = false;
+    private double delayAddingSnakes = 5000;
     private FrameLayout _map;
     private AppCompatActivity _gameActivity;
     private final Handler handler = new Handler();
@@ -65,12 +64,20 @@ public class GameState {
     }
 
     private final Runnable automaticallyAddSnake = new Runnable() {
+        private long lastRunTime = System.currentTimeMillis();
+        private int tenSeconds = 10000;
+
         @Override
         public void run() {
             if (accsesAddSnake) {
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - lastRunTime >= tenSeconds) {
+                    delayAddingSnakes *= 1.05;// increase delay on 5%
+                    lastRunTime = currentTime;
+                }
                 addSnake();
             }
-            handler.postDelayed(this, 5000);
+            handler.postDelayed(this, (long) delayAddingSnakes);
         }
     };
 
@@ -90,8 +97,9 @@ public class GameState {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             float y = event.getY();
             float x = event.getX();
-            removeSnakeNode(x, y);
-            if (PlayerState.getInstance().buyFlower())
+            if (tryRemoveSnakeNode(x, y))
+                return true;
+            else if (PlayerState.getInstance().buyFlower())
                 addFlower(x, y);
             updateCoinsLabel();
             return true;
@@ -99,7 +107,7 @@ public class GameState {
         return false;
     }
 
-    private void removeSnakeNode(float touchX, float touchY) {
+    private boolean tryRemoveSnakeNode(float touchX, float touchY) {
         for (int i = 0; i < _map.getChildCount(); ++i) {
             View child = _map.getChildAt(i);
             if (child instanceof Snake) {
@@ -107,10 +115,11 @@ public class GameState {
                 for (Snake.Node node : snake.getNodes()) {
                     if (Math.abs(node.getPosX() - touchX) < 160 && Math.abs(node.getPosY() - touchY) < 160) {
                         snake.removeNode();
-                        break;
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 }

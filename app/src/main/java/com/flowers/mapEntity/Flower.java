@@ -38,6 +38,10 @@ public class Flower extends View {
         }, 3000);
     }
 
+    public boolean hasFlowerState() {
+        return flowerState == FlowerState.Flower;
+    }
+
     @SuppressLint("DrawAllocation")
     public void onDraw(@NonNull Canvas canvas) {
         int idFlowerImages = (flowerState == FlowerState.Grain) ? R.drawable.grain : R.drawable.flower;
@@ -70,10 +74,10 @@ public class Flower extends View {
                 public void run() {
                     PlayerState.getInstance().increaseNumberCoins();
                     GameState.getInstance().updateCoinsLabel();
-                    handler.postDelayed(this, 1000);
+                    handler.postDelayed(this, 3000);
                 }
             };
-            handler.postDelayed(coinUpdater, 3000);
+            coinUpdater.run();
         }
 
         invalidate();
