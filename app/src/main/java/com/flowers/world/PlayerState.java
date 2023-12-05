@@ -3,17 +3,16 @@ package com.flowers.world;
 public class PlayerState {
 
     private int numberCoins = 150;
-    private int flowerPrice = 50;
+
     private static PlayerState _instance;
 
     public boolean isPossibleCreateNewFlower() {
-        if (numberCoins >= flowerPrice)
+        if (numberCoins >= GameMode.getInstance().getFlowerPrice())
             return true;
         return false;
     }
 
-    public void increaseNumberCoins()
-    {
+    public void increaseNumberCoins() {
         ++numberCoins;
     }
 
@@ -30,7 +29,7 @@ public class PlayerState {
 
     public boolean buyFlower() {
         if (isPossibleCreateNewFlower()) {
-            numberCoins -= flowerPrice;
+            numberCoins -= GameMode.getInstance().getFlowerPrice();
             return true;
         }
         return false;

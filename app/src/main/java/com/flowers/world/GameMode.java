@@ -8,6 +8,11 @@ import com.flowers.mapEntity.Snake;
 
 public class GameMode {
     private static GameMode _instance;
+    private int flowerPrice = 50;
+
+    public int getFlowerPrice() {
+        return flowerPrice;
+    }
 
     public boolean isPossibleAddSnake() {
         FrameLayout map = GameState.getInstance().getMap();
@@ -43,7 +48,6 @@ public class GameMode {
 
         return false;
     }
-
 
     public static GameMode getInstance() {
         if (_instance == null) {
