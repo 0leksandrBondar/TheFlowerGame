@@ -63,6 +63,26 @@ public class GameState {
         return _instance;
     }
 
+    public void updateSnakeSpeed() {
+        FrameLayout map = GameState.getInstance().getMap();
+
+        for (int i = 0; i < map.getChildCount(); ++i) {
+            View child = map.getChildAt(i);
+            if (child instanceof Snake) {
+                Snake snake = (Snake) child;
+                float originalSpeed = snake.getSpeed();
+
+                snake.setSpeed(originalSpeed * 2);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        snake.resetSpeed();
+                    }
+                }, 10000);
+            }
+        }
+    }
+
     private final Runnable automaticallyAddSnake = new Runnable() {
         private long lastRunTime = System.currentTimeMillis();
         private int tenSeconds = 10000;

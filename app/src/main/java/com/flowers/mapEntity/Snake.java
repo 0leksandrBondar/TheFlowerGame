@@ -1,7 +1,6 @@
 package com.flowers.mapEntity;
 
 import static java.lang.Math.sqrt;
-import static java.lang.Math.tan;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.widget.FrameLayout;
 import com.flowers.R;
 import com.flowers.world.GameState;
 
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,7 +25,10 @@ public class Snake extends View {
         Head
     }
 
-    private final float speed = 5;
+    private float defaultSpeed = 5;
+    private float speed = defaultSpeed;
+    private final float maxSpeed = speed * 2;
+
     private CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
 
     public class Node extends View {
@@ -142,6 +143,7 @@ public class Snake extends View {
                         GameState.getInstance().getGameActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                GameState.getInstance().updateSnakeSpeed();
                                 map.removeView(flower);
                             }
                         });
@@ -178,6 +180,19 @@ public class Snake extends View {
                 postInvalidate();
             }
         }, 0, 10);
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float newSpeed) {
+        if (speed < maxSpeed)
+            speed = newSpeed;
+    }
+
+    public void resetSpeed() {
+        speed = defaultSpeed;
     }
 
     public void removeNode() {
