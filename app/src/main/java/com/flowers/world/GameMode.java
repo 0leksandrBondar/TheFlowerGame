@@ -8,21 +8,25 @@ import com.flowers.mapEntity.Snake;
 
 public class GameMode {
     private static GameMode _instance;
-    private int flowerPrice = 50;
+    private final int _flowerPrice = 50;
+    private boolean _wasFlowerAdded = false;
 
     public int getFlowerPrice() {
-        return flowerPrice;
+        return _flowerPrice;
     }
 
     public boolean isPossibleAddSnake() {
+        if (_wasFlowerAdded)
+            return true;
         FrameLayout map = GameState.getInstance().getMap();
         for (int i = 0; i < map.getChildCount(); i++) {
             View child = map.getChildAt(i);
             if (child instanceof Flower) {
-                return true;
+                _wasFlowerAdded = true;
+                break;
             }
         }
-        return false;
+        return _wasFlowerAdded;
     }
 
     public boolean isPossibleAddNode(Snake snake) {

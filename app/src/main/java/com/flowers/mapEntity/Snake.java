@@ -26,18 +26,18 @@ public class Snake extends View {
         Head
     }
 
-    private float defaultSpeed = 5;
+    private final float defaultSpeed = 5;
     private float speed = defaultSpeed;
     private final float maxSpeed = speed * 2;
-    private int maxSnakeLength = 10;
+    private final int maxSnakeLength = 10;
 
-    private CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
 
     public class Node extends View {
         private Node prevNode;
         private Bitmap bitmap;
         private float posX, posY;
-        private NodeType nodeType;
+        private final NodeType nodeType;
         private float targetX, targetY;
         private final int maxSnakeLength = 10;
 
@@ -101,7 +101,7 @@ public class Snake extends View {
             posX += directionX * speed;
             posY += directionY * speed;
 
-            detectCollisionWithFlower(posX, posX);
+            detectCollisionWithFlower();
             detectCollisionWithBorderMap();
             postInvalidate();
         }
@@ -129,7 +129,7 @@ public class Snake extends View {
             }
         }
 
-        private void detectCollisionWithFlower(float posX, float posY) {
+        private void detectCollisionWithFlower() {
             if (nodeType == NodeType.Body)
                 return;
 

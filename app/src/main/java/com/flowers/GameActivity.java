@@ -12,11 +12,9 @@ import com.flowers.world.GameState;
 import com.flowers.world.PlayerState;
 
 public class GameActivity extends AppCompatActivity {
-
+    private boolean isIncreasingCoins = false;
     private final Handler checkFlowersHandler = new Handler();
     private final Handler increaseCoinsHandler = new Handler();
-
-    private boolean isIncreasingCoins = false;
 
     private final Runnable checkFlowers = new Runnable() {
         @Override
@@ -44,13 +42,12 @@ public class GameActivity extends AppCompatActivity {
         }
     };
 
-
     private final Runnable increaseCoins = new Runnable() {
         @Override
         public void run() {
             PlayerState.getInstance().increaseNumberCoins();
             GameState.getInstance().updateCoinsLabel();
-            increaseCoinsHandler.postDelayed(this, 500);
+            increaseCoinsHandler.postDelayed(this, 60000);
         }
     };
 
@@ -67,7 +64,6 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         checkFlowersHandler.removeCallbacks(checkFlowers);
         increaseCoinsHandler.removeCallbacks(increaseCoins);
     }
