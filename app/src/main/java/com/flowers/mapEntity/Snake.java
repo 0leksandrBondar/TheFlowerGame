@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.flowers.R;
+import com.flowers.world.GameMode;
 import com.flowers.world.GameState;
 
 import java.util.Random;
@@ -28,6 +29,7 @@ public class Snake extends View {
     private float defaultSpeed = 5;
     private float speed = defaultSpeed;
     private final float maxSpeed = speed * 2;
+    private int maxSnakeLength = 10;
 
     private CopyOnWriteArrayList<Node> nodes = new CopyOnWriteArrayList<>();
 
@@ -195,6 +197,10 @@ public class Snake extends View {
         speed = defaultSpeed;
     }
 
+    public int getMaxSnakeLength() {
+        return maxSnakeLength;
+    }
+
     public void removeNode() {
         if (!nodes.isEmpty()) {
             nodes.remove(nodes.size() - 1);
@@ -231,7 +237,7 @@ public class Snake extends View {
     }
 
     public void addNode(NodeType type) {
-        if (nodes.size() >= 10)
+        if (!GameMode.getInstance().isPossibleAddNode(this))
             return;
 
         Node node = new Node(GameState.getInstance().getGameActivity(), type);

@@ -17,8 +17,6 @@ public class GameState {
     @SuppressLint("StaticFieldLeak")
     private static GameState _instance;
 
-    // TODO: refactor accsesAddSnake
-    private boolean accsesAddSnake = false;
     private double delayAddingSnakes = 5000;
     private FrameLayout _map;
     private AppCompatActivity _gameActivity;
@@ -89,7 +87,7 @@ public class GameState {
 
         @Override
         public void run() {
-            if (accsesAddSnake) {
+            if (GameMode.getInstance().isPossibleAddSnake()) {
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - lastRunTime >= tenSeconds) {
                     delayAddingSnakes *= 1.05;// increase delay on 5%
@@ -104,7 +102,6 @@ public class GameState {
     private void addFlower(float posX, float posY) {
         Flower newFlower = new Flower(_gameActivity);
         newFlower.setPosition(posX, posY);
-        accsesAddSnake = true;
         _map.addView(newFlower);
     }
 
