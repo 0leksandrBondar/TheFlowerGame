@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.flowers.mapEntity.Flower;
 import com.flowers.world.GameMode;
@@ -56,6 +57,9 @@ public class GameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        TextView textName = findViewById(R.id.name);
+        textName.setText(PlayerState.getInstance().getName());
 
         GameState.getInstance().setActivity(this);
         GameState.getInstance().detectTouchAction();

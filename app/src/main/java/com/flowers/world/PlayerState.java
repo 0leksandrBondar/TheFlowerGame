@@ -3,6 +3,7 @@ package com.flowers.world;
 public class PlayerState {
 
     private int _numberCoins = 150;
+    private String _name;
 
     private static PlayerState _instance;
 
@@ -27,5 +28,13 @@ public class PlayerState {
             return true;
         }
         return false;
+    }
+
+    public String getName() {
+        return _name;
+    }
+
+    public void setName(String _name) {
+        this._name = _name;
     }
 }
