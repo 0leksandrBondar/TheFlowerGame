@@ -2,18 +2,12 @@ package com.flowers.world;
 
 public class PlayerState {
 
-    private int numberCoins = 150;
+    private int _numberCoins = 150;
 
     private static PlayerState _instance;
 
-    public boolean isPossibleCreateNewFlower() {
-        if (numberCoins >= GameMode.getInstance().getFlowerPrice())
-            return true;
-        return false;
-    }
-
-    public void increaseNumberCoins() {
-        ++numberCoins;
+    public void increaseNumberOfCoins() {
+        ++_numberCoins;
     }
 
     public static PlayerState getInstance() {
@@ -24,12 +18,12 @@ public class PlayerState {
     }
 
     public int getNumberCoins() {
-        return numberCoins;
+        return _numberCoins;
     }
 
     public boolean buyFlower() {
-        if (isPossibleCreateNewFlower()) {
-            numberCoins -= GameMode.getInstance().getFlowerPrice();
+        if (GameState.getInstance().isPossibleToCreateNewFlower()) {
+            _numberCoins -= GameMode.getInstance().getFlowerPrice();
             return true;
         }
         return false;

@@ -22,6 +22,24 @@ public class GameState {
     private AppCompatActivity _gameActivity;
     private final Handler handler = new Handler();
 
+    private final Runnable automaticallyAddSnake = new Runnable() {
+        private long lastRunTime = System.currentTimeMillis();
+
+        @Override
+        public void run() {
+            if (isPossibleAddSnake()) {
+                long currentTime = System.currentTimeMillis();
+                int tenSeconds = 10000;
+                if (currentTime - lastRunTime >= tenSeconds) {
+                    delayAddingSnakes *= 1.05;// increase delay on 5%
+                    lastRunTime = currentTime;
+                }
+                addSnake();
+            }
+            handler.postDelayed(this, (long) delayAddingSnakes);
+        }
+    };
+
     public FrameLayout getMap() {
         return _map;
     }
@@ -61,8 +79,8 @@ public class GameState {
         return _instance;
     }
 
-    public void updateSnakeSpeed() {
-        FrameLayout map = GameState.getInstance().getMap();
+    public void updateSnakesSpeed() {
+        FrameLayout map = getMap();
 
         for (int i = 0; i < map.getChildCount(); ++i) {
             View child = map.getChildAt(i);
@@ -71,33 +89,10 @@ public class GameState {
                 float originalSpeed = snake.getSpeed();
 
                 snake.setSpeed(originalSpeed * 2);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        snake.resetSpeed();
-                    }
-                }, 10000);
+                new Handler().postDelayed(snake::resetSpeed, 10000);
             }
         }
     }
-
-    private final Runnable automaticallyAddSnake = new Runnable() {
-        private long lastRunTime = System.currentTimeMillis();
-        private int tenSeconds = 10000;
-
-        @Override
-        public void run() {
-            if (GameMode.getInstance().isPossibleAddSnake()) {
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastRunTime >= tenSeconds) {
-                    delayAddingSnakes *= 1.05;// increase delay on 5%
-                    lastRunTime = currentTime;
-                }
-                addSnake();
-            }
-            handler.postDelayed(this, (long) delayAddingSnakes);
-        }
-    };
 
     private void addFlower(float posX, float posY) {
         Flower newFlower = new Flower(_gameActivity);
@@ -125,12 +120,15 @@ public class GameState {
     }
 
     private boolean tryRemoveSnakeNode(float touchX, float touchY) {
+        int width = GameMode.getInstance().getBitmapWidth();
+        int height = GameMode.getInstance().getBitmapHeight();
+
         for (int i = 0; i < _map.getChildCount(); ++i) {
             View child = _map.getChildAt(i);
             if (child instanceof Snake) {
                 Snake snake = (Snake) child;
                 for (Snake.Node node : snake.getNodes()) {
-                    if (Math.abs(node.getPosX() - touchX) < 160 && Math.abs(node.getPosY() - touchY) < 160) {
+                    if (Math.abs(node.getPosX() - touchX) < width && Math.abs(node.getPosY() - touchY) < height) {
                         snake.removeNode();
                         return true;
                     }
@@ -139,4 +137,44 @@ public class GameState {
         }
         return false;
     }
+
+    public boolean isPossibleAddSnake() {
+        if (GameMode.getInstance().wasFlowerAdded())
+            return true;
+        FrameLayout map = getMap();
+        for (int i = 0; i < map.getChildCount(); i++) {
+            View child = map.getChildAt(i);
+            if (child instanceof Flower) {
+                GameMode.getInstance().setWasFlowerAdded(true);
+                break;
+            }
+        }
+        return GameMode.getInstance().wasFlowerAdded();
+    }
+
+    public boolean isPossibleAddNode(Snake snake) {
+        int snakeLength = snake.getNodes().size();
+        return checkCountOfFlowersOnMap() && snakeLength < snake.getMaxSnakeLength() ||
+                !checkCountOfFlowersOnMap() && snakeLength < snake.getMaxSnakeLength() / 2;
+    }
+
+    public boolean checkCountOfFlowersOnMap() {
+        FrameLayout map = getMap();
+        int flowerCount = 0;
+        for (int i = 0; i < map.getChildCount(); ++i) {
+            View child = map.getChildAt(i);
+            if (child instanceof Flower) {
+                ++flowerCount;
+                if (flowerCount >= 2) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isPossibleToCreateNewFlower() {
+        return PlayerState.getInstance().getNumberCoins() >= GameMode.getInstance().getFlowerPrice();
+    }
+
 }

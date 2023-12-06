@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.flowers.mapEntity.Flower;
+import com.flowers.world.GameMode;
 import com.flowers.world.GameState;
 import com.flowers.world.PlayerState;
 
@@ -33,21 +34,21 @@ public class GameActivity extends AppCompatActivity {
             if (hasFlower) {
                 increaseCoinsHandler.removeCallbacks(increaseCoins);
                 isIncreasingCoins = false;
-            } else if (!hasFlower && PlayerState.getInstance().getNumberCoins() < 50 && !isIncreasingCoins) {
+            } else if (PlayerState.getInstance().getNumberCoins() < GameMode.getInstance().getFlowerPrice() && !isIncreasingCoins) {
                 increaseCoinsHandler.post(increaseCoins);
                 isIncreasingCoins = true;
             }
 
-            checkFlowersHandler.postDelayed(this, 1000);
+            checkFlowersHandler.postDelayed(this, GameMode.getInstance().getFlowerCheckDelayMillis());
         }
     };
 
     private final Runnable increaseCoins = new Runnable() {
         @Override
         public void run() {
-            PlayerState.getInstance().increaseNumberCoins();
+            PlayerState.getInstance().increaseNumberOfCoins();
             GameState.getInstance().updateCoinsLabel();
-            increaseCoinsHandler.postDelayed(this, 60000);
+            increaseCoinsHandler.postDelayed(this, GameMode.getInstance().getCoinIncreaseDelayMillis());
         }
     };
 
@@ -58,6 +59,8 @@ public class GameActivity extends AppCompatActivity {
 
         GameState.getInstance().setActivity(this);
         GameState.getInstance().detectTouchAction();
+        GameState.getInstance().updateCoinsLabel();
+
         checkFlowersHandler.post(checkFlowers);
     }
 
