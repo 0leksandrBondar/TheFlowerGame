@@ -1,7 +1,5 @@
 package com.flowers.mapEntity;
 
-import static java.lang.Math.sqrt;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +10,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 
 import com.flowers.R;
+import com.flowers.Utils.MathUtils;
 import com.flowers.world.GameMode;
 import com.flowers.world.GameState;
 
@@ -72,13 +71,9 @@ public class Snake extends View {
             canvas.drawBitmap(_bitmap, _posX, _posY, null);
         }
 
-        public float vectorLen(float x, float y) {
-            return (float) sqrt(x * x + y * y);
-        }
-
         private void updatePosition() {
             float dist = GameMode.getInstance().getDistBetweenNodes();
-            if (_prevNode != null && vectorLen(_posX - _prevNode._posX, _posY - _prevNode._posY) < dist) {
+            if (_prevNode != null && MathUtils.vectorLen(_posX - _prevNode._posX, _posY - _prevNode._posY) < dist) {
                 return;
             }
 
@@ -87,13 +82,13 @@ public class Snake extends View {
 
             float directionX = tX - _posX;
             float directionY = tY - _posY;
-            float len = vectorLen(directionX, directionY);
+            float len = MathUtils.vectorLen(directionX, directionY);
 
-            if (equals(len, 0.0f, _speed * 1.2f)) {
+            if (MathUtils.equals(len, 0.0f, _speed * 1.2f)) {
                 tryRandomizeDirection();
                 directionX = tX - _posX;
                 directionY = tY - _posY;
-                len = vectorLen(directionX, directionY);
+                len = MathUtils.vectorLen(directionX, directionY);
             }
 
             directionX /= len;
@@ -105,10 +100,6 @@ public class Snake extends View {
             detectCollisionWithFlower();
             detectCollisionWithBorderMap();
             postInvalidate();
-        }
-
-        public boolean equals(float a, float b, float Epsilon) {
-            return a == b ? true : Math.abs(a - b) < Epsilon;
         }
 
 
@@ -134,6 +125,8 @@ public class Snake extends View {
             if (_nodeType == NodeType.Body)
                 return;
 
+            int bitmapWidth = GameMode.getInstance().getBitmapWidth();
+            int bitmapHeight = GameMode.getInstance().getBitmapHeight();
             FrameLayout map = GameState.getInstance().getMap();
             Node head = nodes.get(0);
 
@@ -141,14 +134,11 @@ public class Snake extends View {
                 View flowerChild = map.getChildAt(i);
                 if (flowerChild instanceof Flower) {
                     Flower flower = (Flower) flowerChild;
-                    if (flower.hasFlowerState() && Math.abs(head.getPosX() - flower.posX()) < 160 && Math.abs(head.getPosY() - flower.posY()) < 160) {
+                    if (flower.hasFlowerState() && Math.abs(head.getPosX() - flower.posX()) < bitmapWidth && Math.abs(head.getPosY() - flower.posY()) < bitmapHeight) {
                         flower.stopCoinUpdater();
-                        GameState.getInstance().getGameActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                GameState.getInstance().updateSnakesSpeed();
-                                map.removeView(flower);
-                            }
+                        GameState.getInstance().getGameActivity().runOnUiThread(() -> {
+                            GameState.getInstance().updateSnakesSpeed();
+                            map.removeView(flower);
                         });
                         break;
                     }
