@@ -21,12 +21,12 @@ public class Flower extends View {
         Grain, Flower
     }
 
-    private Handler handler;
-    private float posY = 0, posX = 0;
-    private Bitmap flowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grain);
-    private Runnable coinUpdater;
-    private Paint paint = new Paint();
-    private FlowerState flowerState = FlowerState.Grain;
+    private Handler _handler;
+    private float _posY = 0, _posX = 0;
+    private Bitmap _flowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.grain);
+    private Runnable _coinUpdater;
+    private Paint _paint = new Paint();
+    private FlowerState _flowerState = FlowerState.Grain;
 
     public Flower(Context context) {
         super(context);
@@ -34,51 +34,51 @@ public class Flower extends View {
     }
 
     public boolean hasFlowerState() {
-        return flowerState == FlowerState.Flower;
+        return _flowerState == FlowerState.Flower;
     }
 
     public void onDraw(@NonNull Canvas canvas) {
-        canvas.drawBitmap(flowerBitmap, posX, posY, paint);
+        canvas.drawBitmap(_flowerBitmap, _posX, _posY, _paint);
     }
 
     public void setPosition(float x, float y) {
-        posX = x;
-        posY = y;
+        _posX = x;
+        _posY = y;
         invalidate(); // display update
     }
 
     public float posX() {
-        return posX;
+        return _posX;
     }
 
     public float posY() {
-        return posY;
+        return _posY;
     }
 
     private void setFlowerState(FlowerState state) {
-        flowerState = state;
-        if (flowerState == FlowerState.Flower)
-            flowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.flower);
+        _flowerState = state;
+        if (_flowerState == FlowerState.Flower)
+            _flowerBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.flower);
 
         if (hasFlowerState()) {
-            handler = new Handler(Looper.getMainLooper());
-            coinUpdater = new Runnable() {
+            _handler = new Handler(Looper.getMainLooper());
+            _coinUpdater = new Runnable() {
                 @Override
                 public void run() {
                     PlayerState.getInstance().increaseNumberOfCoins();
                     GameState.getInstance().updateCoinsLabel();
-                    handler.postDelayed(this, GameMode.getInstance().getCoinUpdateIntervalMillis());
+                    _handler.postDelayed(this, GameMode.getInstance().getCoinUpdateIntervalMillis());
                 }
             };
-            coinUpdater.run();
+            _coinUpdater.run();
         }
 
         invalidate();
     }
 
     public void stopCoinUpdater() {
-        if (handler != null && coinUpdater != null) {
-            handler.removeCallbacks(coinUpdater);
+        if (_handler != null && _coinUpdater != null) {
+            _handler.removeCallbacks(_coinUpdater);
         }
     }
 }

@@ -17,7 +17,6 @@ public class GameState {
     @SuppressLint("StaticFieldLeak")
     private static GameState _instance;
 
-    private double delayAddingSnakes = 5000;
     private FrameLayout _map;
     private AppCompatActivity _gameActivity;
     private final Handler handler = new Handler();
@@ -27,16 +26,18 @@ public class GameState {
 
         @Override
         public void run() {
+            float delay = GameMode.getInstance().getDelayAddingSnakes();
+
             if (isPossibleAddSnake()) {
                 long currentTime = System.currentTimeMillis();
                 int tenSeconds = 10000;
                 if (currentTime - lastRunTime >= tenSeconds) {
-                    delayAddingSnakes *= 1.05;// increase delay on 5%
+                    delay *= 1.05;// increase delay on 5%
                     lastRunTime = currentTime;
                 }
                 addSnake();
             }
-            handler.postDelayed(this, (long) delayAddingSnakes);
+            handler.postDelayed(this, (long) delay);
         }
     };
 

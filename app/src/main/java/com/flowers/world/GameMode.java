@@ -1,10 +1,5 @@
 package com.flowers.world;
 
-import android.view.View;
-import android.widget.FrameLayout;
-
-import com.flowers.mapEntity.Flower;
-
 public class GameMode {
     private static GameMode _instance;
     private final int _flowerPrice = 50;
@@ -16,6 +11,8 @@ public class GameMode {
     private final int _bitmapHeight = 160;
     private final int _bitmapWidth = 160;
     private final float _distBetweenNodes = 110;
+    private float _delayAddingSnakes = 5000;
+
 
     private boolean _wasFlowerAdded = false;
 
@@ -68,5 +65,9 @@ public class GameMode {
 
     public boolean wasFlowerAdded() {
         return _wasFlowerAdded;
+    }
+
+    public float getDelayAddingSnakes() {
+        return _delayAddingSnakes;
     }
 }
