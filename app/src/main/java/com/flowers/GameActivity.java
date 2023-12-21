@@ -2,8 +2,14 @@ package com.flowers;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -14,6 +20,7 @@ import com.flowers.world.GameState;
 import com.flowers.world.PlayerState;
 
 public class GameActivity extends AppCompatActivity {
+    private SharedPreferences prefs;
     private boolean isIncreasingCoins = false;
     private final Handler checkFlowersHandler = new Handler();
     private final Handler increaseCoinsHandler = new Handler();
@@ -69,9 +76,54 @@ public class GameActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        int savedCoins = prefs.getInt("numberCoins", 0);
+        if (savedCoins < 150) {
+            long lastCloseTime = prefs.getLong("lastCloseTime", 0);
+            long currentTime = System.currentTimeMillis();
+            if (lastCloseTime != 0) {
+                long differenceInMinutes = (currentTime - lastCloseTime) / (1000 * 60);
+                int coinsToAdd = (int) differenceInMinutes;
+                PlayerState.getInstance().setNumberCoins(savedCoins);
+                PlayerState.getInstance().addCoins(coinsToAdd);
+                GameState.getInstance().updateCoinsLabel();
+            }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        final int flowerPrice = GameMode.getInstance().getFlowerPrice();
+        final int countPlayerCoins = PlayerState.getInstance().getNumberCoins();
+
+        if (countPlayerCoins < flowerPrice) {
+            prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong("lastCloseTime", System.currentTimeMillis());
+            editor.putInt("numberCoins", countPlayerCoins);
+            editor.apply();
+
+            final int delay = (flowerPrice - countPlayerCoins) * (1000 * 60);
+            scheduleNotification(delay);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         checkFlowersHandler.removeCallbacks(checkFlowers);
         increaseCoinsHandler.removeCallbacks(increaseCoins);
+    }
+
+    private void scheduleNotification(int delay) {
+        Intent notificationIntent = new Intent(this, NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+        long futureInMillis = SystemClock.elapsedRealtime() + delay;
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
     }
 }

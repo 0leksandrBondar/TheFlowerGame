@@ -11,6 +11,10 @@ public class PlayerState {
         ++_numberCoins;
     }
 
+    public void addCoins(int coins) {
+        _numberCoins += coins;
+    }
+
     public static PlayerState getInstance() {
         if (_instance == null) {
             _instance = new PlayerState();
@@ -20,6 +24,10 @@ public class PlayerState {
 
     public int getNumberCoins() {
         return _numberCoins;
+    }
+
+    public void setNumberCoins(int coins) {
+        _numberCoins = coins;
     }
 
     public boolean buyFlower() {
