@@ -24,6 +24,7 @@ public class GameActivity extends AppCompatActivity {
     private boolean isIncreasingCoins = false;
     private final Handler checkFlowersHandler = new Handler();
     private final Handler increaseCoinsHandler = new Handler();
+    private final int minuteInMillis = 60000;
 
     private final Runnable checkFlowers = new Runnable() {
         @Override
@@ -78,37 +79,13 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-        int savedCoins = prefs.getInt("numberCoins", 0);
-        if (savedCoins < 150) {
-            long lastCloseTime = prefs.getLong("lastCloseTime", 0);
-            long currentTime = System.currentTimeMillis();
-            if (lastCloseTime != 0) {
-                long differenceInMinutes = (currentTime - lastCloseTime) / (1000 * 60);
-                int coinsToAdd = (int) differenceInMinutes;
-                PlayerState.getInstance().setNumberCoins(savedCoins);
-                PlayerState.getInstance().addCoins(coinsToAdd);
-                GameState.getInstance().updateCoinsLabel();
-            }
-        }
+        updateGameData();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        final int flowerPrice = GameMode.getInstance().getFlowerPrice();
-        final int countPlayerCoins = PlayerState.getInstance().getNumberCoins();
-
-        if (countPlayerCoins < flowerPrice) {
-            prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putLong("lastCloseTime", System.currentTimeMillis());
-            editor.putInt("numberCoins", countPlayerCoins);
-            editor.apply();
-
-            final int delay = (flowerPrice - countPlayerCoins) * (1000 * 60);
-            scheduleNotification(delay);
-        }
+        saveGameData();
     }
 
     @Override
@@ -125,5 +102,39 @@ public class GameActivity extends AppCompatActivity {
         long futureInMillis = SystemClock.elapsedRealtime() + delay;
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
+    }
+
+    private void updateGameData() {
+        prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+        int savedCoins = prefs.getInt("numberCoins", 0);
+
+        if (savedCoins < GameMode.getInstance().getFlowerPrice()) {
+            long lastCloseTime = prefs.getLong("lastCloseTime", 0);
+            long currentTime = System.currentTimeMillis();
+
+            if (lastCloseTime != 0) {
+                long differenceInMinutes = (currentTime - lastCloseTime) / minuteInMillis;
+                int coinsToAdd = (int) differenceInMinutes;
+                PlayerState.getInstance().setNumberCoins(savedCoins);
+                PlayerState.getInstance().addCoins(coinsToAdd);
+                GameState.getInstance().updateCoinsLabel();
+            }
+        }
+    }
+
+    private void saveGameData() {
+        final int flowerPrice = GameMode.getInstance().getFlowerPrice();
+        final int countPlayerCoins = PlayerState.getInstance().getNumberCoins();
+
+        if (countPlayerCoins < flowerPrice) {
+            prefs = getSharedPreferences("GamePrefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putLong("lastCloseTime", System.currentTimeMillis());
+            editor.putInt("numberCoins", countPlayerCoins);
+            editor.apply();
+
+            final int delay = (flowerPrice - countPlayerCoins) * (1000 * 60);
+            scheduleNotification(delay);
+        }
     }
 }
